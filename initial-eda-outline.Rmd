@@ -1,6 +1,6 @@
 ---
 title: "Initial EDA Basic Outline"
-author: "Names of all group members"
+author: "Vydeepthi Dhulipalla"
 output: html_notebook
 ---
 
@@ -8,19 +8,77 @@ This is an outline for your Initial EDA. You can follow this outline, or you can
 
 ## Research Question 
 
-State your specific research question and why it is interesting. 
-
-
+The research question for this project is: How do different factors such as GRE scores, GPA, undergraduate institution rank, socioeconomic status, gender, and race influence the admission of international students into colleges in the USA? This question is of interest as understanding the factors that impact admission can help improve the admission process and promote fairness and inclusivity.
 
 ## Data Processing 
+```{r}
+library(tidyverse)
+library(dplyr)
 
-#### Data Intake 
+```
+#### Data Intake
+```{r}
+ 
+# Import the first dataset
+admission <- read.csv("Admission.csv")
+head(admission)
+# Dataset description: 
+# Attribute Description
+# GRE: Graduate Record Exam Scores
+# GPA: Grade Point Average
+# Rank: It refers to the prestige of the undergraduate institution. The variable rank takes on the values 1 through 4. Institutions with a rank of 1 have the highest prestige, while those with a rank of 4 have the lowest.
+# Admit: It is a response variable; admit/don’t admit is a binary variable where 1 indicates that student is admitted and 0 indicates that student is not admitted.
+# SES: SES refers to socioeconomic status: 1 - low, 2 - medium, 3 - high.
+# Gender_male: Gender_male (0, 1) = 0 -> Female, 1 -> Male
+# Race: Race – 1, 2, and 3 represent Hispanic, Asian, and African-American
 
-Include R code and written explanation to import your **TWO** data sets.
+
+```
+
+```{r}
+# Import the second dataset
+prediction <- read.csv("Prediction.csv")
+# Dataset description:
+# GRE.Score: GRE score
+# TOEFL.Score: TOEFL score
+# University.Rating: University rating
+# SOP: Statement of Purpose score
+# LOR: Letter of Recommendation score
+# CGPA: Cumulative GPA
+# Research: Research experience
+# Chance.of.Admit.: Predicted admission rate
+
+head(prediction)
+```
+
+
+
+
 
 #### Data Wrangling 
 
-Include R code and written explanation for wangling your data (you can make multiple wrangled data sets). 
+
+```{r}
+# Filter rows based on a condition
+filtered_data <- admission %>% 
+  filter(gre > 600)
+
+# Mutate to create a new variable
+mutated_data <- admission %>% 
+  mutate(total_score = gre + gpa)
+
+# Summarize data by a variable
+summarized_data <- admission %>% 
+  group_by(Race) %>% 
+  summarise(avg_gre = mean(gre))
+
+# Joining the datasets
+merged_data <- inner_join(admission, prediction, by = c("gre" = "GRE.Score"))
+
+# Print the merged dataset
+View(merged_data)
+
+```
 
 
 
@@ -29,13 +87,35 @@ Include R code and written explanation for wangling your data (you can make mult
 
 #### Plot 1
 
-Include R code to make one data visualization (I would encourage you to use 3 or more variables). Include a brief written description of what your graph shows. Is this graph helpful in answering your research question? If it is helpful, will you need to add/modify anything in this graph in the final report? 
+Description: The scatter plot shows the relationship between GRE score and CGPA, with the points colored according to the chance of admission. This visualization helps us understand if there is any correlation between GRE score, CGPA, and the likelihood of admission. From the plot, we can observe if higher GRE scores and CGPA are associated with a higher chance of admission. This graph can be helpful in answering the research question by providing initial insights into the relationship between these variables.
+```{r}
+library(ggplot2)
+
+# Scatter plot
+ggplot(data = merged_data, aes(x = gre, y = CGPA, color = Chance.of.Admit.)) +
+  geom_point() +
+  labs(x = "GRE Score", y = "CGPA", color = "Chance of Admit") +
+  theme_minimal()
+
+```
+
 
 #### Plot 2
+The bar plot displays the count of observations based on GRE score, with the bars filled according to gender. The plot is divided into panels based on the different values of the chance of admission. This visualization allows us to examine the distribution of GRE scores among different genders and their relationship to the chance of admission. It provides insights into any gender disparities in admissions based on GRE scores. This graph can be helpful in answering the research question by examining potential gender-based biases in admissions related to GRE scores.
+```{r}
+# Convert Gender_Male to factor
+merged_data$Gender_Male <- factor(merged_data$Gender_Male, labels = c("Female", "Male"))
 
-Include R code to make one data visualization (I would encourage you to use 3 or more variables). Include a brief written description of what your graph shows. Is this graph helpful in answering your research question? If it is helpful, will you need to add/modify anything in this graph in the final report? 
+# Bar plot
+ggplot(data = merged_data, aes(x = gre, fill = Gender_Male)) +
+  geom_bar() +
+  labs(x = "GRE Score", y = "Count", fill = "Gender") +
+  facet_wrap(~Chance.of.Admit., nrow = 1) +
+  theme_minimal()
+
+```
 
 
 ## Conclusion
 
-Include your initial intuition as to what the answer to your research question is using the data sets and visualizations you created. 
+Factors such as higher GRE scores, higher GPAs, higher-ranked undergraduate institutions, and research experience may have a positive influence on the chance of admission for international students into colleges in the USA. 
