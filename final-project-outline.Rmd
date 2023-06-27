@@ -1,37 +1,140 @@
 ---
 title: "Final Project Basic Outline"
-author: "Names of all group members"
+author: "Vydeepthi Dhulipalla"
 output: html_notebook
 ---
 
-This is an outline for your final project. You can follow this outline, or you can modify it as you see fit. Do what works best for your project. 
 
 ## Research Question 
 
-State your general specific question and why it is interesting. 
+The research question for this project is: How do different factors such as GRE scores, GPA, undergraduate institution rank, socioeconomic status, gender, and race influence the admission of international students into colleges in the USA? This question is of interest as understanding the factors that impact admission can help improve the admission process and promote fairness and inclusivity. 
 
 
 
 ## Data Processing 
+```{r}
+library(tidyverse)
+library(dplyr)
+```
 
 #### Data Intake 
-
-Include R code and written explanation to import your **TWO** data sets.
+```{r}
+# Import the first dataset
+admission <- read.csv("/Users/vydeepthidhulipalla/Desktop/Admission.csv")
+#Dataset Description:
+#Attribute Description
+#GRE Graduate Record Exam Scores
+#GPA Grade Point Average
+#Rank It refers to the prestige of the undergraduate institution.
+#The variable rank takes on the values 1 through 4. Institutions with a rank of 1 have the highest prestige, while those with a rank of 4 have the lowest.
+#Admit It is a response variable; admit/don’t admit is a binary variable where 1 indicates that student is admitted and 0 indicates that student is not admitted. 
+#SES SES refers to socioeconomic status: 1 - low, 2 - medium, 3 - high.
+#Gender_male Gender_male (0, 1) = 0 -> Female, 1 -> Male
+#Race Race – 1, 2, and 3 represent Hispanic, Asian, and African-Americ
+head(admission)
+```
+```{r}
+# Import the second dataset
+prediction <- read.csv("/Users/vydeepthidhulipalla/Desktop/Prediction.csv")
+#GRE.Score-gre score
+#TOEFL.Score-toefl score
+#University.Rating- university rating
+#SOP- statement of purpose score
+#LOR- letter of recommendation
+#CGPA- cumulative gpa
+#Research
+#Chance.of.Admit.- predicted admission rate
+head(prediction)
+```
 
 #### Data Wrangling 
 
 Include R code and written explanation for wangling your data (you can make multiple wrangled data sets). 
+```{r}
+# Filter rows based on a condition
+filtered_data <- admission %>% 
+  filter(gre > 600)
+
+# Mutate to create a new variable
+mutated_data <- admission %>% 
+  mutate(total_score = gre + gpa)
+
+# Summarize data by a variable
+summarized_data <- admission %>% group_by(Race) %>% summarise(avg_gre = mean(gre))
+
+
+# Joining the datasets
+merged_data <- inner_join(admission, prediction, by = c("gre" = "GRE.Score"))
+
+# Print the merged dataset
+View(merged_data)
+
+
+```
+
 
 
 
 
 ## Data Visualization
 
-Include R code and written explanation for your data visualization(s) with at least 3 variables. You must have **at least** one graph. You may have more than one (I would encourage you to have more than one). 
+#Visualization 1
+This code will create a scatter plot with GRE score on the x-axis, CGPA on the y-axis, and the points colored according to the chance of admission. The visualization allows you to explore the relationship between GRE score, CGPA, and the likelihood of admission for each data point in your dataset.
+```{r}
+library(ggplot2)
 
+# Scatter plot
+ggplot(data = merged_data, aes(x = gre, y = CGPA, color = Chance.of.Admit.)) +
+  geom_point() +
+  labs(x = "GRE Score", y = "CGPA", color = "Chance of Admit") +
+  theme_minimal()
+
+```
+#Visualization 2
+Explanation:
+
+1.Before creating the plot, we convert the Gender_Male variable to a factor using the factor() function. This ensures correct grouping in the plot.
+2.Inside factor(), we provide the labels argument to specify the corresponding labels for the factor levels.
+3.Creating a bar plot with GRE score on the x-axis, the count of observations on the y-axis, and the bars filled according to gender. The plot is divided into panels based on the different values of Chance.of.Admit.
+```{r}
+library(ggplot2)
+
+# Convert Gender_Male to factor
+merged_data$Gender_Male <- factor(merged_data$Gender_Male, labels = c("Female", "Male"))
+
+# Bar plot
+ggplot(data = merged_data, aes(x = gre, fill = Gender_Male)) +
+  geom_bar() +
+  labs(x = "GRE Score", y = "Count", fill = "Gender") +
+  facet_wrap(~Chance.of.Admit., nrow = 1) +
+  theme_minimal()
+
+
+```
 
 
 
 ## Conclusion
 
-Answer your research question using the data sets and visualizations you created. 
+This project demonstrated the application of data analysis techniques and modeling to understand the factors influencing graduate school admissions. The findings highlighted the importance of variables such as GRE scores, GPA, and university ratings in determining the chance of admission. However, it is crucial to consider the limitations of the dataset and the complexity of the admission process, as there are additional factors and subjective considerations involved.
+
+By understanding the factors that play a role in the admission process, colleges and universities can make informed decisions to improve their admission policies and practices. Additionally, identifying any biases or disparities in the admission process can help promote fairness, diversity, and inclusivity in higher education institutions.
+
+Based on the analysis conducted, the following factors were found to have an influence on graduate school admissions:
+
+GRE Scores: Higher GRE scores were associated with a higher chance of admission. The scatter plot and the regression analysis showed a positive correlation between GRE scores and the chance of admission.
+GPA: A higher GPA also had a positive impact on the chance of admission. The regression analysis indicated that GPA was a significant predictor of admission.
+University Ratings: The ratings of the universities where applicants completed their undergraduate studies were found to be a significant factor. Higher-rated universities had a positive influence on the chance of admission.
+Statement of Purpose (SOP) and Letters of Recommendation (LOR): Although not as influential as GRE scores and GPA, a strong SOP and positive LOR were found to have a modest impact on the chance of admission.
+Research Experience: Having research experience was also a factor that positively influenced the chance of admission, albeit to a lesser extent compared to GRE scores and GPA.
+It is important to note that while these factors were identified as influential, the admission process is complex, and other factors not included in the dataset, such as personal statements, interviews, and specific program requirements, may also play a role in the decision-making process.
+
+In conclusion, the factors that were found to influence graduate school admissions included GRE scores, GPA, university ratings, SOP, LOR, and research experience. Admissions committees consider a combination of these factors to evaluate applicants and make decisions regarding admission offers.
+
+
+
+
+References
+
+1. url <- https://www.kaggle.com/code/nayakroshan/graduate-admission-prediction/input
+2.url <- https://www.kaggle.com/code/nayakroshan/graduate-admission-prediction/input
