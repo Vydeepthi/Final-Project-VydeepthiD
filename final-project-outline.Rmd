@@ -48,7 +48,7 @@ head(prediction)
 
 #### Data Wrangling 
 
-Include R code and written explanation for wangling your data (you can make multiple wrangled data sets). 
+
 ```{r}
 # Filter rows based on a condition
 filtered_data <- admission %>% 
