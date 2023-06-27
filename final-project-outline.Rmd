@@ -10,7 +10,6 @@ output: html_notebook
 The research question for this project is: How do different factors such as GRE scores, GPA, undergraduate institution rank, socioeconomic status, gender, and race influence the admission of international students into colleges in the USA? This question is of interest as understanding the factors that impact admission can help improve the admission process and promote fairness and inclusivity. 
 
 
-
 ## Data Processing 
 ```{r}
 library(tidyverse)
